@@ -52,13 +52,14 @@ pipeline {
             parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
           } catch (err) {
             scope = false
+            echo"${scope}"
           }
-          if(proceed){
+          if(proceed)
             echo "${env.RELEASE_SCOPE}"
+            sh './jenkins/scripts/deliver.sh'
           }
         }
-        echo "${env.RELEASE_SCOPE}"
-        sh './jenkins/scripts/deliver.sh'
+        echo "post""
       }
     }
   }
