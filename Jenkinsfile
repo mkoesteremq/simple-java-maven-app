@@ -7,7 +7,7 @@ pipeline {
     )
     choice(
       name: "Version",
-      choices: ['Major', 'Minor', 'Patch'],
+      choices: ['Patch', 'Minor', 'Major'],
       description : "SemVer-String",
     )
   }
@@ -40,6 +40,11 @@ pipeline {
         always {
           junit 'target/surefire-reports/*.xml'
         }
+      }
+    }
+    stage("deliver"){
+      steps {
+        sh './jenkins/scripts/deliver.sh'
       }
     }
   }
