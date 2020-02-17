@@ -46,8 +46,16 @@ pipeline {
     stage('Deliver') {
       steps {
         script {
-          env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
-          parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
+          def proceed = "true"
+          try{
+            env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
+            parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
+          } catch (err) {
+            scope = false
+          }
+          if(proceed){
+            echo "${env.RELEASE_SCOPE}"
+          }
         }
         echo "${env.RELEASE_SCOPE}"
         sh './jenkins/scripts/deliver.sh'
