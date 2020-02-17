@@ -46,24 +46,17 @@ pipeline {
     stage('Deliver') {
       steps {
         script {
-          def proceed = true
+          env.RELEASE_SCOPE='patch'
           timeout(time: 15, unit: 'SECONDS'){
             env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
             parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
           }
-        }
-        post{
-          failure{
-            proceed = false
-            echo"scope: ${scope}"
-          }
-        }
-        if(proceed==true){
+      post{
+        always{
           echo "${env.RELEASE_SCOPE}"
           sh './jenkins/scripts/deliver.sh'
         }
       }
-      echo "post"
     }
   }
 }
