@@ -46,7 +46,7 @@ pipeline {
     stage('Deliver') {
       steps {
         script {
-          env.RELEASE_SCOPE='patch'
+          env.RELEASE_SCOPE=''
           timeout(time: 15, unit: 'SECONDS'){
             env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
             parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
@@ -57,6 +57,7 @@ pipeline {
         always{
           echo "${env.RELEASE_SCOPE}"
           sh './jenkins/scripts/deliver.sh'
+          slackNotification currentBuild.currentResult
         }
       }
     }
