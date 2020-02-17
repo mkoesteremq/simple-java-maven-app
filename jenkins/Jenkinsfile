@@ -59,7 +59,7 @@ pipeline {
             sh './jenkins/scripts/deliver.sh'
           }
         }
-        echo "post""
+        echo "post"
       }
     }
   }
