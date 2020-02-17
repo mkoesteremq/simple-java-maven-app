@@ -45,7 +45,12 @@ pipeline {
       }
       stage('Deliver') {
           steps {
-              sh './jenkins/scripts/deliver.sh'
+            script {
+                env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
+                        parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
+            }
+            echo "${env.RELEASE_SCOPE}"
+            sh './jenkins/scripts/deliver.sh'
           }
       }
   }
