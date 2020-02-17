@@ -48,8 +48,8 @@ pipeline {
         script {
           def proceed = "true"
           try{
-            timeout(time: 5, unit: 'SECONDS'){
-              env.Version = input message: 'User input required', ok: 'Release!',
+            timeout(time: 5, unit: 'SECONDS') {
+              env.Version = input message: 'User input required', ok: 'Release!'
             }
           } catch (err) {
             proceed = false
