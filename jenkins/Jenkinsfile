@@ -61,6 +61,11 @@ pipeline {
           }
         }
       }
+      post{
+        always{
+          echo "${proceed}"
+        }
+      }
     }
   }
 }
