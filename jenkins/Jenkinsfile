@@ -53,10 +53,10 @@ pipeline {
               parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
             }
           } catch (err) {
-            scope = false
-            echo"${scope}"
+            proceed = false
+            echo"scope: ${scope}"
           }
-          if(proceed){
+          if(proceed==true){
             echo "${env.RELEASE_SCOPE}"
             sh './jenkins/scripts/deliver.sh'
           }
