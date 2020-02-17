@@ -17,7 +17,7 @@ pipeline {
     builds_to_keep = "${params.Environment == 'prod' ? '5' : '1'}"
   }
   options {
-        buildDiscarder(logRotator(numToKeepStr: env.builds_to_keep))
+        buildDiscarder(logRotator(numToKeepStr: "${env.builds_to_keep}"))
         disableConcurrentBuilds()
         skipStagesAfterUnstable()
   }
