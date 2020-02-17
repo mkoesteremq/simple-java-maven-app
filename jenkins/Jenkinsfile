@@ -46,10 +46,11 @@ pipeline {
     stage('Deliver') {
       steps {
         script {
-          def proceed = "true"
+          def proceed = true
           try{
             timeout(time: 15, unit: 'SECONDS'){
-              params.Version = input message: 'User input required', ok: 'Release!'
+              env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
+              parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
             }
           } catch (err) {
             proceed = false
