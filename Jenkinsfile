@@ -1,0 +1,64 @@
+pipeline {
+  parameters {
+    choice(
+      name: "Environment",
+      choices: ['staging', 'prod'],
+      description : "Release Scope for basic-auth. Deployment for dev needs to be done manually ",
+    )
+    choice(
+      name: "Version",
+      choices: ['Patch', 'Minor', 'Major'],
+      description : "SemVer-String",
+    )
+  }
+  environment {
+    stack_prefix = "${params.Environment == 'prod' ? 'xdn' : 'xdn-staging'}"
+    stack_environment = "${params.Environment == 'prod' ? 'prod' : 'stage'}"
+    builds_to_keep = "${params.Environment == 'prod' ? '5' : '1'}"
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: "${env.builds_to_keep}"))
+    disableConcurrentBuilds()
+    skipStagesAfterUnstable()
+  }
+  agent {
+    docker {
+      image 'maven:3-alpine'
+      args '-v /root/.m2:/root/.m2'
+    }
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'mvn -B -DskipTests clean package'
+      }
+    }
+    stage('Test') {
+      steps {
+        sh 'mvn test -Dmaven.test.failure.ignore=true'
+      }
+      post {
+        success {
+          junit 'target/surefire-reports/*.xml'
+        }
+      }
+    }
+    stage('Deliver') {
+      steps {
+        script {
+          env.RELEASE_SCOPE=''
+          timeout(time: 15, unit: 'SECONDS'){
+            env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
+            parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
+          }
+        }
+      }
+      post{
+        always{
+          echo "${env.RELEASE_SCOPE}"
+          sh './jenkins/scripts/deliver.sh'
+        }
+      }
+    }
+  }
+}
